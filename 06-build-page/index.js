@@ -2,11 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const fsPromises = require('fs').promises;
 
-const pathDist = path.join(__dirname, '\\project-dist\\');
-const pathAssetsCopy = path.join(pathDist, '\\assets\\');
-const pathStyles = path.join(__dirname, '\\styles\\');
-const pathComponents = path.join(__dirname, '\\components\\');
-const pathAssets = path.join(__dirname, '\\assets\\');
+const pathDist = path.resolve(__dirname, 'project-dist');
+const pathAssetsCopy = path.resolve(pathDist, 'assets');
+const pathStyles = path.resolve(__dirname, 'styles');
+const pathComponents = path.resolve(__dirname, 'components');
+const pathAssets = path.resolve(__dirname, 'assets');
 
 fsPromises.rmdir(pathDist, { recursive: true })
   .finally(() => {
@@ -16,10 +16,10 @@ fsPromises.rmdir(pathDist, { recursive: true })
     return recursiveCopy(pathAssets,pathAssetsCopy);
   })
   .then(()=>{
-    return mergeStyles(pathStyles, path.join(pathDist, 'style.css'));
+    return mergeStyles(pathStyles, path.resolve(pathDist, 'style.css'));
   })
   .then(()=>{
-    return createHtml(pathComponents, path.join(__dirname, 'template.html'), path.join(pathDist, 'index.html'));
+    return createHtml(pathComponents, path.resolve(__dirname, 'template.html'), path.resolve(pathDist, 'index.html'));
   })
   .catch((err)=> {
     callback(err);
@@ -34,7 +34,7 @@ async function recursiveCopy(source, destination) {
         fsPromises.readdir(source, {withFileTypes: true})
           .then((files)=>{
             files.forEach((file) => {
-              recursiveCopy(path.join(source, file.name), path.join(destination, file.name));
+              recursiveCopy(path.resolve(source, file.name), path.resolve(destination, file.name));
             });
           });
       } else {
@@ -55,7 +55,7 @@ function mergeStyles(source, destination){
           let outList = [];
           for (const file of files){
             if(file.isFile() && (path.parse(file.name).ext === '.css')){
-              outList.push(path.join(source + file.name));
+              outList.push(path.resolve(source , file.name));
             }
           }
           streamMerge(outList, destination);
@@ -90,7 +90,7 @@ async function createHtml( pathComponents, inputFile, outputFile){
   const files = await fsPromises.readdir(pathComponents, { withFileTypes: true });
 
   for (let file of files) {
-    const fileComponent = await fsPromises.readFile(path.join(pathComponents, `${file.name}`), 'utf-8');
+    const fileComponent = await fsPromises.readFile(path.resolve(pathComponents, `${file.name}`), 'utf-8');
     fileTemplate = fileTemplate.replace('{{'+ file.name.slice(0,-5)+'}}', fileComponent);
   }
   await fsPromises.writeFile(outputFile, fileTemplate);
