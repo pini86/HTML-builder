@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const fsPromises = require('fs').promises;
 
-fsPromises.rmdir(path.resolve(__dirname , 'files-copy'), { recursive: true })
+fsPromises.rm(path.resolve(__dirname , 'files-copy'), { recursive: true, force: true })
   .finally(() => {
     fs.mkdir(path.resolve(__dirname , 'files-copy'), { recursive: true },copyFiles);
   });

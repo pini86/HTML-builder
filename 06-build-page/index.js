@@ -8,7 +8,7 @@ const pathStyles = path.resolve(__dirname, 'styles');
 const pathComponents = path.resolve(__dirname, 'components');
 const pathAssets = path.resolve(__dirname, 'assets');
 
-fsPromises.rmdir(pathDist, { recursive: true })
+fsPromises.rm(pathDist, { recursive: true, force: true })
   .finally(() => {
     return fsPromises.mkdir(pathDist, { recursive: true });
   })
